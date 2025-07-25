@@ -1,5 +1,8 @@
--- NextAuth.js PostgreSQL schema
+-- NextAuth.js PostgreSQL schema with UUID support
 -- https://authjs.dev/getting-started/adapters/pg
+
+-- Enable UUID extension
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE verification_token
 (
@@ -12,8 +15,8 @@ CREATE TABLE verification_token
 
 CREATE TABLE accounts
 (
-  id SERIAL,
-  "userId" INTEGER NOT NULL,
+  id UUID DEFAULT uuid_generate_v4(),
+  "userId" UUID NOT NULL,
   type VARCHAR(255) NOT NULL,
   provider VARCHAR(255) NOT NULL,
   "providerAccountId" VARCHAR(255) NOT NULL,
@@ -30,8 +33,8 @@ CREATE TABLE accounts
 
 CREATE TABLE sessions
 (
-  id SERIAL,
-  "userId" INTEGER NOT NULL,
+  id UUID DEFAULT uuid_generate_v4(),
+  "userId" UUID NOT NULL,
   expires TIMESTAMPTZ NOT NULL,
   "sessionToken" VARCHAR(255) NOT NULL,
 
@@ -40,7 +43,7 @@ CREATE TABLE sessions
 
 CREATE TABLE users
 (
-  id SERIAL,
+  id UUID DEFAULT uuid_generate_v4(),
   name VARCHAR(255),
   email VARCHAR(255),
   "emailVerified" TIMESTAMPTZ,
@@ -52,7 +55,7 @@ CREATE TABLE users
 CREATE TABLE authenticators
 (
   "credentialID" TEXT NOT NULL,
-  "userId" INTEGER NOT NULL,
+  "userId" UUID NOT NULL,
   "providerAccountId" VARCHAR(255) NOT NULL,
   "credentialPublicKey" TEXT NOT NULL,
   counter INTEGER NOT NULL,

@@ -31,9 +31,9 @@ export const authOptions: NextAuthOptions = {
         params: {
           prompt: "consent",
           access_type: "offline",
-          response_type: "code"
-        }
-      }
+          response_type: "code",
+        },
+      },
     }),
     CredentialsProvider({
       name: "credentials",
@@ -48,7 +48,7 @@ export const authOptions: NextAuthOptions = {
           credentials?.password === "demo"
         ) {
           return {
-            id: "1",
+            id: "550e8400-e29b-41d4-a716-446655440000",
             name: "Demo User",
             email: "demo@example.com",
           };
