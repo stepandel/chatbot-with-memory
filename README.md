@@ -1,36 +1,146 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI Chat App
 
-## Getting Started
+A full-stack chat application with AI responses, vector memory, and user authentication.
 
-First, run the development server:
+## Features
+
+- 🤖 **AI Chat**: Powered by OpenAI GPT-4o
+- 🧠 **Vector Memory**: Pinecone for conversation context retrieval
+- 🔐 **Authentication**: NextAuth.js with PostgreSQL
+- 💬 **Real-time Streaming**: Streaming AI responses
+- 👤 **Multi-user**: Isolated conversations per user
+
+## Tech Stack
+
+- **Frontend**: Next.js 15 (App Router), React, TypeScript, Tailwind CSS, ShadCN UI
+- **Backend**: Next.js API Routes, NextAuth.js
+- **Database**: PostgreSQL (Docker)
+- **Vector DB**: Pinecone
+- **AI**: OpenAI GPT-4o + text-embedding-3-small
+
+## Quick Start
+
+### 1. Clone and Install
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <your-repo>
+cd chat-app
+pnpm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Start Database
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+# Start PostgreSQL with Docker Compose
+docker-compose up -d postgres
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# The database schema will be automatically applied on first run
+```
 
-## Learn More
+### 3. Environment Setup
 
-To learn more about Next.js, take a look at the following resources:
+Copy `.env.local` and update the required API keys:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `OPENAI_API_KEY` - Your OpenAI API key
+- `PINECONE_API_KEY` - Your Pinecone API key
+- `PINECONE_INDEX` - Your Pinecone index name
+- `NEXTAUTH_SECRET` - Generate with: `openssl rand -base64 32`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 4. Run Development Server
 
-## Deploy on Vercel
+```bash
+pnpm dev
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Visit [http://localhost:3000](http://localhost:3000)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Authentication
+
+### Demo Credentials
+
+- **Email**: `demo@example.com`
+- **Password**: `demo`
+
+### Google OAuth
+
+Configure your Google OAuth credentials in `.env.local`
+
+## Database Management
+
+### pgAdmin (Optional)
+
+Access pgAdmin at [http://localhost:8080](http://localhost:8080)
+
+- **Email**: `admin@chatapp.com`
+- **Password**: `admin123`
+
+### Direct PostgreSQL Access
+
+```bash
+# Connect to database
+docker exec -it chat-app-postgres psql -U chat_user -d chat_app_db
+
+# View tables
+\dt
+
+# Stop database
+docker-compose down
+```
+
+## Import ChatGPT Conversations
+
+You can import your existing ChatGPT conversation history:
+
+```bash
+# Export conversations from ChatGPT Settings > Data Controls > Export
+# Place the conversations.json file in the project root
+pnpm exec tsx scripts/import-conversations.ts ./conversations.json
+```
+
+## Development
+
+### Key Files
+
+- `src/app/page.tsx` - Main chat interface
+- `src/app/api/chat/route.ts` - Chat API with AI + vector search
+- `src/lib/auth.ts` - NextAuth configuration
+- `src/lib/openai.ts` - OpenAI client wrapper
+- `src/lib/pinecone.ts` - Pinecone client wrapper
+
+### Database Schema
+
+The PostgreSQL schema is automatically applied when you start the database. See `sql/schema.sql` for the complete schema.
+
+### Adding New Auth Providers
+
+Edit `src/lib/auth.ts` to add additional OAuth providers.
+
+## Production Deployment
+
+1. **Database**: Use a managed PostgreSQL service
+2. **Environment**: Update all environment variables
+3. **Security**: Generate a secure `NEXTAUTH_SECRET`
+4. **Domain**: Update `NEXTAUTH_URL` to your production domain
+
+## Troubleshooting
+
+### Database Connection Issues
+
+```bash
+# Check if PostgreSQL is running
+docker-compose ps
+
+# View logs
+docker-compose logs postgres
+
+# Restart database
+docker-compose restart postgres
+```
+
+### Clear Database
+
+```bash
+# Remove all data and restart fresh
+docker-compose down -v
+docker-compose up -d postgres
+```
