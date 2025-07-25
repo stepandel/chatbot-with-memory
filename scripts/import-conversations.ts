@@ -75,7 +75,7 @@ async function importConversations(
     if (!conversation.mapping) continue;
 
     // Extract messages from mapping object
-    const conversationMessages = Object.values(conversation.mapping)
+    const rawMessages = Object.values(conversation.mapping)
       .filter((node: any) => node.message && node.message.author)
       .map((node: any) => {
         const message = node.message;
@@ -86,19 +86,16 @@ async function importConversations(
           : undefined;
 
         return {
-          role:
-            role === "user"
-              ? "user"
-              : role === "assistant"
-              ? "assistant"
-              : null,
+          role: role as "user" | "assistant",
           content,
           timestamp,
         };
       })
-      .filter((msg: any) => msg.role && msg.content.trim());
+      .filter((msg: any) => 
+        (msg.role === "user" || msg.role === "assistant") && msg.content.trim()
+      );
 
-    messages.push(...conversationMessages);
+    messages.push(...rawMessages);
   }
 
   console.log(`Found ${messages.length} messages to import`);

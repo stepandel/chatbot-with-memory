@@ -1,6 +1,6 @@
 import { DefaultSession, NextAuthOptions } from "next-auth";
-import PostgresAdapter from "@auth/pg-adapter";
-import { Pool } from "pg";
+import { PrismaAdapter } from "@auth/prisma-adapter";
+import { prisma } from "@/lib/prisma";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 
@@ -12,17 +12,9 @@ declare module "next-auth" {
   }
 }
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl:
-    process.env.NODE_ENV === "production"
-      ? { rejectUnauthorized: false }
-      : false,
-});
-
 export const authOptions: NextAuthOptions = {
   debug: process.env.NODE_ENV === "development",
-  adapter: PostgresAdapter(pool),
+  adapter: PrismaAdapter(prisma),
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
