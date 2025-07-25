@@ -1,17 +1,25 @@
 import { NextRequest } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { createEmbedding, createChatCompletion } from "@/lib/openai";
 import { queryMessages, upsertMessage, ChatMessage } from "@/lib/pinecone";
 import { v4 as uuidv4 } from "uuid";
 
 export async function POST(request: NextRequest) {
   try {
+    // Check authentication
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return new Response("Unauthorized", { status: 401 });
+    }
+
     const { message } = await request.json();
 
     if (!message) {
       return new Response("Message is required", { status: 400 });
     }
 
-    const userId = "default"; // For now, using a single user
+    const userId = session.user.id; // Use authenticated user ID
 
     // Step 1: Create embedding for the user message
     const userEmbedding = await createEmbedding(message);
