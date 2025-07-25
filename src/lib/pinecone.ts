@@ -1,10 +1,24 @@
-import { Pinecone } from "@pinecone-database/pinecone";
+import { Index, Pinecone } from "@pinecone-database/pinecone";
 
-const pinecone = new Pinecone({
-  apiKey: process.env.PINECONE_API_KEY!,
-});
+let pinecone: Pinecone | null = null;
+let index: Index | null = null;
 
-const index = pinecone.index(process.env.PINECONE_INDEX!);
+function getPinecone() {
+  if (!pinecone) {
+    pinecone = new Pinecone({
+      apiKey: process.env.PINECONE_API_KEY!,
+    });
+  }
+  return pinecone;
+}
+
+function getIndex() {
+  if (!index) {
+    const client = getPinecone();
+    index = client.index(process.env.PINECONE_INDEX!);
+  }
+  return index;
+}
 
 export interface ChatMessage {
   id: string;
@@ -19,6 +33,7 @@ export async function queryMessages(
   userId: string = "default",
   topK: number = 5
 ) {
+  const index = getIndex();
   const queryResponse = await index.namespace(userId).query({
     vector: embedding,
     topK,
@@ -40,6 +55,7 @@ export async function upsertMessage(
   message: ChatMessage,
   userId: string = "default"
 ) {
+  const index = getIndex();
   await index.namespace(userId).upsert([
     {
       id,
