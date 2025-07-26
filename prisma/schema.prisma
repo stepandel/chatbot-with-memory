@@ -50,6 +50,7 @@ model User {
   accounts      Account[]
   sessions      Session[]
   authenticators Authenticator[]
+  contextualMetadata UserContextualMetadata?
 
   @@map("users")
 }
@@ -77,4 +78,27 @@ model Authenticator {
 
   @@unique([userId, credentialID])
   @@map("authenticators")
+}
+
+model UserContextualMetadata {
+  id                        String   @id @default(uuid()) @db.Uuid
+  userId                    String   @unique @db.Uuid
+  prominentTopics          Json     @default("[]")
+  representativeConversations Json @default("[]")
+  narrativeOverviews       Json     @default("[]")
+  keyQuestions             Json     @default("[]")
+  emergingTrends           Json     @default("[]")
+  userSentiments           Json     @default("[]")
+  peopleMentions           Json     @default("[]")
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+  lastInteractionAt        DateTime @default(now())
+  interactionCount         Int      @default(0)
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([lastInteractionAt])
+  @@index([updatedAt])
+  @@map("user_contextual_metadata")
 }
