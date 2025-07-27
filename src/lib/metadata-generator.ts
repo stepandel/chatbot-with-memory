@@ -13,10 +13,7 @@ export interface GeneratedMetadata {
   keyQuestions: string[];
   emergingTrends: string[];
   userSentiments: string[];
-  peopleMentions: Array<{
-    name: string;
-    context: string;
-  }>;
+  peopleMentions: string[];
 }
 
 export interface ExistingMetadata {
@@ -159,19 +156,6 @@ Based on this new conversation and the existing metadata, what updates should be
         (metadata as unknown as Record<string, unknown>)[field] = [];
       }
     }
-
-    // Validate people mentions structure
-    if (Array.isArray(metadata.peopleMentions)) {
-      for (const mention of metadata.peopleMentions) {
-        if (!mention.name || !mention.context) {
-          // If mention is missing name or context, set to empty array and break
-          metadata.peopleMentions = [];
-          break;
-        }
-      }
-    } else {
-      metadata.peopleMentions = [];
-    }
   }
 
   static mergeMetadata(
@@ -230,11 +214,9 @@ Based on this new conversation and the existing metadata, what updates should be
     const existingNames = existing.peopleMentions.map((p) => p.toLowerCase());
 
     merged.peopleMentions.push(
-      ...newMetadata.peopleMentions
-        .filter(
-          (mention) => !existingNames.includes(mention.name.toLowerCase())
-        )
-        .map((mention) => mention.name)
+      ...newMetadata.peopleMentions.filter(
+        (mention) => !existingNames.includes(mention.toLowerCase())
+      )
     );
 
     return merged;
