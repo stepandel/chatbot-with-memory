@@ -8,9 +8,13 @@ declare module "next-auth" {
   interface Session {
     user: {
       id: string;
+      mode?: "fun" | "regular";
     } & DefaultSession["user"];
   }
 }
+
+// Fun Mode: Shared default user ID for collective experience
+export const FUN_MODE_USER_ID = "00000000-0000-4000-8000-000000000000";
 
 export const authOptions: NextAuthOptions = {
   debug: false,
@@ -28,24 +32,16 @@ export const authOptions: NextAuthOptions = {
       },
     }),
     CredentialsProvider({
-      name: "credentials",
-      credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
-      },
-      async authorize(credentials) {
-        // For demo purposes - in production, validate against your user database
-        if (
-          credentials?.email === "demo@example.com" &&
-          credentials?.password === "demo"
-        ) {
-          return {
-            id: "550e8400-e29b-41d4-a716-446655440000",
-            name: "Demo User",
-            email: "demo@example.com",
-          };
-        }
-        return null;
+      id: "fun-mode",
+      name: "Fun Mode",
+      credentials: {},
+      async authorize() {
+        // Fun Mode: Auto-login without credentials
+        return {
+          id: FUN_MODE_USER_ID,
+          name: "Fun Mode User",
+          email: "fun-mode@example.com",
+        };
       },
     }),
   ],
@@ -56,15 +52,28 @@ export const authOptions: NextAuthOptions = {
     signIn: "/auth/signin",
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, account }) {
       if (user) {
-        token.userId = user.id;
+        if (account?.provider === "fun-mode") {
+          // Fun Mode: Use shared user ID for collective experience
+          token.userId = FUN_MODE_USER_ID;
+          token.mode = "fun";
+        } else {
+          // Regular Mode: Use individual user ID
+          token.userId = user.id;
+          token.mode = "regular";
+        }
       }
       return token;
     },
     async session({ session, token }) {
       if (token) {
         session.user.id = token.userId as string;
+        session.user.mode = token.mode as "fun" | "regular";
+
+        if (token.mode === "fun") {
+          session.user.name = "Fun Mode User";
+        }
       }
       return session;
     },

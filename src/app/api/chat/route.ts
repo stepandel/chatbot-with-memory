@@ -1,10 +1,11 @@
 import { NextRequest } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { authOptions, FUN_MODE_USER_ID } from "@/lib/auth";
 import { createEmbedding, createChatCompletion } from "@/lib/openai";
 import { queryMessages, upsertMessage, ChatMessage } from "@/lib/pinecone";
 import { MetadataService } from "@/lib/metadata-service";
 import { ContextFormatter } from "@/lib/context-formatter";
+import { ensureFunModeUser } from "../../../../lib/fun-mode-setup";
 import { v4 as uuidv4 } from "uuid";
 
 export async function POST(request: NextRequest) {
@@ -21,7 +22,16 @@ export async function POST(request: NextRequest) {
       return new Response("Message is required", { status: 400 });
     }
 
-    const userId = session.user.id; // Use authenticated user ID
+    // Determine user ID based on mode
+    let userId: string;
+    if (session.user.mode === "fun") {
+      // Fun Mode: Ensure shared user exists and use shared user ID
+      await ensureFunModeUser();
+      userId = FUN_MODE_USER_ID;
+    } else {
+      // Regular Mode: Use individual user ID
+      userId = session.user.id;
+    }
 
     // Step 1, 2, 3: Parallelize metadata loading, embedding creation, and context query
     const [userMetadata, userEmbedding] = await Promise.all([
