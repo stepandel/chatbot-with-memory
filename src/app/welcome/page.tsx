@@ -55,7 +55,7 @@ export default function WelcomePage() {
                 </ul>
               </div>
 
-              <Link href="/auth/signin/fun">
+              <Link href="/">
                 <Button 
                   className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-medium py-4 text-lg"
                   size="lg"
@@ -103,7 +103,7 @@ export default function WelcomePage() {
                 </ul>
               </div>
 
-              <Link href="/auth/signin/regular">
+              <Link href="/app">
                 <Button 
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-4 text-lg"
                   size="lg"
