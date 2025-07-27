@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Send, LogOut } from "lucide-react";
 import ChatSidebar from "./chat-sidebar";
 import { useConversations } from "@/hooks/useConversations";
+import { ConversationTitleGenerator } from "@/lib/conversation-title-generator";
 
 interface Message {
   id: string;
@@ -24,7 +25,7 @@ interface Conversation {
 
 export default function PersonalChatInterface() {
   const { data: session } = useSession();
-  const { createConversation } = useConversations();
+  const { createConversation, refreshConversations } = useConversations();
   const [currentConversation, setCurrentConversation] =
     useState<Conversation | null>(null);
   const [input, setInput] = useState("");
@@ -65,7 +66,12 @@ export default function PersonalChatInterface() {
 
     // If no current conversation, create one first
     if (!currentConversation) {
-      const newConversation = await createConversation(input.slice(0, 50) + "...");
+      // Generate a meaningful title based on the user's message
+      const initialTitle = await ConversationTitleGenerator.generateTitle({
+        userMessage: input
+      });
+      
+      const newConversation = await createConversation(initialTitle);
       if (newConversation) {
         setCurrentConversation({
           ...newConversation,
@@ -176,6 +182,30 @@ export default function PersonalChatInterface() {
             };
           });
         }
+
+        // After streaming is complete, improve the title if this is the first exchange
+        setCurrentConversation((prev) => {
+          if (prev && prev.messages.length <= 2) {
+            const finalAssistantMessage = prev.messages.find(m => m.role === "assistant");
+            if (finalAssistantMessage && finalAssistantMessage.content) {
+              // Asynchronously update the title with both user message and assistant response
+              ConversationTitleGenerator.updateTitleWithResponse(
+                conversationId,
+                messageContent,
+                finalAssistantMessage.content,
+                (newTitle) => {
+                  // Update the current conversation title in state
+                  setCurrentConversation(current => 
+                    current ? { ...current, title: newTitle } : null
+                  );
+                  // Refresh the conversations list in the sidebar
+                  refreshConversations();
+                }
+              );
+            }
+          }
+          return prev;
+        });
       }
     } catch (error) {
       console.error("Error sending message:", error);

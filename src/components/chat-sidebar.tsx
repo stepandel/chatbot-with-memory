@@ -30,7 +30,8 @@ export default function ChatSidebar({
   const [editTitle, setEditTitle] = useState("");
 
   const handleNewChat = async () => {
-    const newConversation = await createConversation("New Chat");
+    // Use a generic title for manually created chats - user can edit it later
+    const newConversation = await createConversation("New Conversation");
     if (newConversation) {
       onNewChat();
       onConversationSelect(newConversation.id);
