@@ -3,7 +3,7 @@
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 import { useEffect } from "react";
-import ChatInterface from "@/components/chat-interface";
+import PersonalChatInterface from "@/components/personal-chat-interface";
 
 export default function RegularModePage() {
   const { data: session, status } = useSession();
@@ -35,5 +35,5 @@ export default function RegularModePage() {
     return null; // Will redirect
   }
 
-  return <ChatInterface mode="regular" />;
+  return <PersonalChatInterface />;
 }
