@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { createEmbedding, createChatCompletion } from "@/lib/openai";
 import { queryMessages, upsertMessage, ChatMessage } from "@/lib/pinecone";
+import { MetadataService } from "@/lib/metadata-service";
 import { v4 as uuidv4 } from "uuid";
 
 export async function POST(request: NextRequest) {
@@ -90,6 +91,14 @@ export async function POST(request: NextRequest) {
             assistantEmbedding,
             assistantMessage,
             userId
+          );
+
+          // Step 6: Update contextual metadata asynchronously
+          MetadataService.processMetadataAsync(
+            userId,
+            message,
+            assistantResponse,
+            timestamp
           );
 
           controller.close();

@@ -33,4 +33,30 @@ export async function createChatCompletion(
   });
 }
 
+export async function generateAutocomplete(
+  prompt: string,
+  model: string = "gpt-4o"
+) {
+  const client = getOpenAI();
+  return client.chat.completions.create({
+    model,
+    messages: [{ role: "user", content: prompt }],
+  });
+}
+
+export async function generateWithSystemPrompt(
+  systemPrompt: string,
+  userPrompt: string,
+  model: string = "gpt-4o"
+) {
+  const client = getOpenAI();
+  return client.chat.completions.create({
+    model,
+    messages: [
+      { role: "system", content: systemPrompt },
+      { role: "user", content: userPrompt }
+    ],
+  });
+}
+
 export { getOpenAI as openai };

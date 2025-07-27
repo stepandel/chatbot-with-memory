@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build",
-    "start": "next start",
+    "dev": "pnpm db:generate && next dev --turbopack",
+    "build": "pnpm db:generate && next build",
+    "start": "pnpm db:generate && next start",
     "lint": "next lint",
     "db:migrate": "prisma migrate dev",
     "db:reset": "prisma migrate reset",
