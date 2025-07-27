@@ -1,19 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Plus, MessageSquare, Trash2, Edit2, Check, X } from "lucide-react";
-
-interface Conversation {
-  id: string;
-  title: string;
-  createdAt: string;
-  updatedAt: string;
-  _count: {
-    messages: number;
-  };
-}
+import { useConversations } from "@/hooks/useConversations";
 
 interface ChatSidebarProps {
   currentConversationId: string | null;
@@ -26,45 +17,23 @@ export default function ChatSidebar({
   onConversationSelect, 
   onNewChat 
 }: ChatSidebarProps) {
-  const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { 
+    conversations, 
+    loading, 
+    error,
+    createConversation, 
+    deleteConversation, 
+    updateConversation 
+  } = useConversations();
+  
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState("");
 
-  useEffect(() => {
-    fetchConversations();
-  }, []);
-
-  const fetchConversations = async () => {
-    try {
-      const response = await fetch("/api/conversations");
-      if (response.ok) {
-        const data = await response.json();
-        setConversations(data);
-      }
-    } catch (error) {
-      console.error("Error fetching conversations:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleNewChat = async () => {
-    try {
-      const response = await fetch("/api/conversations", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: "New Chat" }),
-      });
-
-      if (response.ok) {
-        const newConversation = await response.json();
-        setConversations(prev => [newConversation, ...prev]);
-        onNewChat();
-        onConversationSelect(newConversation.id);
-      }
-    } catch (error) {
-      console.error("Error creating new chat:", error);
+    const newConversation = await createConversation("New Chat");
+    if (newConversation) {
+      onNewChat();
+      onConversationSelect(newConversation.id);
     }
   };
 
@@ -75,25 +44,13 @@ export default function ChatSidebar({
       return;
     }
 
-    try {
-      const response = await fetch(`/api/conversations/${conversationId}`, {
-        method: "DELETE",
-      });
-
-      if (response.ok) {
-        setConversations(prev => prev.filter(c => c.id !== conversationId));
-        
-        // If we deleted the current conversation, trigger new chat
-        if (conversationId === currentConversationId) {
-          onNewChat();
-        }
-      }
-    } catch (error) {
-      console.error("Error deleting conversation:", error);
+    const success = await deleteConversation(conversationId);
+    if (success && conversationId === currentConversationId) {
+      onNewChat();
     }
   };
 
-  const handleEditStart = (conversation: Conversation, e: React.MouseEvent) => {
+  const handleEditStart = (conversation: { id: string; title: string }, e: React.MouseEvent) => {
     e.stopPropagation();
     setEditingId(conversation.id);
     setEditTitle(conversation.title);
@@ -102,22 +59,8 @@ export default function ChatSidebar({
   const handleEditSave = async (conversationId: string) => {
     if (!editTitle.trim()) return;
 
-    try {
-      const response = await fetch(`/api/conversations/${conversationId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: editTitle.trim() }),
-      });
-
-      if (response.ok) {
-        const updatedConversation = await response.json();
-        setConversations(prev => 
-          prev.map(c => c.id === conversationId ? updatedConversation : c)
-        );
-      }
-    } catch (error) {
-      console.error("Error updating conversation:", error);
-    } finally {
+    const success = await updateConversation(conversationId, editTitle.trim());
+    if (success) {
       setEditingId(null);
       setEditTitle("");
     }
@@ -148,6 +91,24 @@ export default function ChatSidebar({
           {[...Array(5)].map((_, i) => (
             <div key={i} className="h-16 bg-gray-200 rounded"></div>
           ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="w-64 bg-gray-50 border-r border-gray-200 p-4">
+        <div className="text-center text-red-600 py-8">
+          <p className="text-sm">Error loading conversations</p>
+          <Button 
+            onClick={() => window.location.reload()} 
+            variant="outline" 
+            size="sm" 
+            className="mt-2"
+          >
+            Retry
+          </Button>
         </div>
       </div>
     );

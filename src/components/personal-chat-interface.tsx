@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Send, LogOut } from "lucide-react";
 import ChatSidebar from "./chat-sidebar";
+import { useConversations } from "@/hooks/useConversations";
 
 interface Message {
   id: string;
@@ -23,6 +24,7 @@ interface Conversation {
 
 export default function PersonalChatInterface() {
   const { data: session } = useSession();
+  const { createConversation } = useConversations();
   const [currentConversation, setCurrentConversation] =
     useState<Conversation | null>(null);
   const [input, setInput] = useState("");
@@ -63,26 +65,18 @@ export default function PersonalChatInterface() {
 
     // If no current conversation, create one first
     if (!currentConversation) {
-      try {
-        const response = await fetch("/api/conversations", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ title: input.slice(0, 50) + "..." }),
+      const newConversation = await createConversation(input.slice(0, 50) + "...");
+      if (newConversation) {
+        setCurrentConversation({
+          ...newConversation,
+          messages: [],
         });
 
-        if (response.ok) {
-          const newConversation = await response.json();
-          setCurrentConversation({
-            ...newConversation,
-            messages: [],
-          });
-
-          // Wait a bit for state to update then proceed with message
-          setTimeout(() => sendMessage(newConversation.id, input), 100);
-          return;
-        }
-      } catch (error) {
-        console.error("Error creating conversation:", error);
+        // Wait a bit for state to update then proceed with message
+        setTimeout(() => sendMessage(newConversation.id, input), 100);
+        return;
+      } else {
+        // Failed to create conversation
         return;
       }
     }
