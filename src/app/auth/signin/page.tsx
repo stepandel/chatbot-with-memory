@@ -26,9 +26,10 @@ export default function SignInModeSelector() {
                 Fun Mode
               </h2>
               <p className="text-gray-700 mb-6">
-                Join a collective AI experience where everyone shares the same conversation memory
+                Join a collective AI experience where everyone shares the same
+                conversation memory
               </p>
-              
+
               <div className="mb-6">
                 <h3 className="font-medium text-purple-800 mb-3">Features:</h3>
                 <ul className="text-sm text-purple-700 space-y-2 text-left">
@@ -40,8 +41,8 @@ export default function SignInModeSelector() {
                 </ul>
               </div>
 
-              <Link href="/auth/signin/fun">
-                <Button 
+              <Link href="/">
+                <Button
                   className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-medium py-3"
                   size="lg"
                 >
@@ -59,9 +60,10 @@ export default function SignInModeSelector() {
                 Personal Mode
               </h2>
               <p className="text-gray-700 mb-6">
-                Your private, personalized AI assistant with secure authentication
+                Your private, personalized AI assistant with secure
+                authentication
               </p>
-              
+
               <div className="mb-6">
                 <h3 className="font-medium text-blue-800 mb-3">Features:</h3>
                 <ul className="text-sm text-blue-700 space-y-2 text-left">
@@ -74,7 +76,7 @@ export default function SignInModeSelector() {
               </div>
 
               <Link href="/auth/signin/regular">
-                <Button 
+                <Button
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3"
                   size="lg"
                 >
@@ -87,7 +89,8 @@ export default function SignInModeSelector() {
 
         <div className="text-center mt-8">
           <p className="text-sm text-gray-500">
-            You can switch between modes anytime. Both modes offer the same AI capabilities.
+            You can switch between modes anytime. Both modes offer the same AI
+            capabilities.
           </p>
         </div>
       </div>

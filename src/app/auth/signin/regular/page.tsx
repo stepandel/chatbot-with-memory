@@ -3,6 +3,7 @@
 import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import Link from "next/link";
 
 export default function RegularModeSignIn() {
   const handleOAuthSignIn = (provider: string) => {
@@ -42,12 +43,12 @@ export default function RegularModeSignIn() {
             Sign in with Google
           </Button>
           <div className="text-center">
-            <a 
-              href="/auth/signin/fun" 
+            <Link 
+              href="/" 
               className="text-sm text-purple-600 hover:text-purple-800 underline"
             >
               Or try Fun Mode (shared experience)
-            </a>
+            </Link>
           </div>
         </div>
       </Card>

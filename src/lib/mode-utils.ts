@@ -36,5 +36,5 @@ export function getModeHomePath(mode: AppMode): string {
  * Gets the appropriate signin path for a mode
  */
 export function getModeSigninPath(mode: AppMode): string {
-  return mode === 'fun' ? '/auth/signin/fun' : '/auth/signin/regular';
+  return mode === 'fun' ? '/' : '/auth/signin/regular';
 }
