@@ -233,25 +233,6 @@ Based on this new conversation and the existing metadata, what updates should be
       )
     );
 
-    // Apply strict limits to prevent unbounded growth
-    const strictLimits = {
-      prominentTopics: 15,
-      representativeConversations: 10,
-      narrativeOverviews: 8,
-      keyQuestions: 12,
-      emergingTrends: 10,
-      userSentiments: 12,
-      peopleMentions: 25,
-    };
-
-    Object.entries(strictLimits).forEach(([key, limit]) => {
-      const field = key as keyof ExistingMetadata;
-      if (merged[field].length > limit) {
-        // Keep most recent entries
-        merged[field] = merged[field].slice(-limit);
-      }
-    });
-
     return merged;
   }
 
