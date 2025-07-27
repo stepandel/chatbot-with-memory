@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Plus, MessageSquare, Trash2, Edit2, Check, X } from "lucide-react";
+import { Plus, MessageSquare, Trash2, Edit2, Check, X, ChevronLeft } from "lucide-react";
 import { useConversations } from "@/hooks/useConversations";
 
 interface ChatSidebarProps {
@@ -11,13 +11,17 @@ interface ChatSidebarProps {
   onConversationSelect: (conversationId: string) => void;
   onNewChat: () => void;
   conversationsHook: ReturnType<typeof useConversations>;
+  isOpen: boolean;
+  onToggle: () => void;
 }
 
 export default function ChatSidebar({ 
   currentConversationId, 
   onConversationSelect, 
   onNewChat,
-  conversationsHook
+  conversationsHook,
+  isOpen,
+  onToggle
 }: ChatSidebarProps) {
   const { 
     conversations, 
@@ -86,14 +90,25 @@ export default function ChatSidebar({
     return date.toLocaleDateString();
   };
 
+  const sidebarClasses = `
+    ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+    fixed md:relative md:translate-x-0 
+    w-80 md:w-64
+    bg-gray-50 border-r border-gray-200 
+    flex flex-col h-full z-50
+    transition-transform duration-300 ease-in-out
+  `;
+
   if (loading) {
     return (
-      <div className="w-64 bg-gray-50 border-r border-gray-200 p-4">
-        <div className="animate-pulse space-y-4">
-          <div className="h-10 bg-gray-200 rounded"></div>
-          {[...Array(5)].map((_, i) => (
-            <div key={i} className="h-16 bg-gray-200 rounded"></div>
-          ))}
+      <div className={sidebarClasses}>
+        <div className="p-4">
+          <div className="animate-pulse space-y-4">
+            <div className="h-10 bg-gray-200 rounded"></div>
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="h-16 bg-gray-200 rounded"></div>
+            ))}
+          </div>
         </div>
       </div>
     );
@@ -101,29 +116,44 @@ export default function ChatSidebar({
 
   if (error) {
     return (
-      <div className="w-64 bg-gray-50 border-r border-gray-200 p-4">
-        <div className="text-center text-red-600 py-8">
-          <p className="text-sm">Error loading conversations</p>
-          <Button 
-            onClick={() => window.location.reload()} 
-            variant="outline" 
-            size="sm" 
-            className="mt-2"
-          >
-            Retry
-          </Button>
+      <div className={sidebarClasses}>
+        <div className="p-4">
+          <div className="text-center text-red-600 py-8">
+            <p className="text-sm">Error loading conversations</p>
+            <Button 
+              onClick={() => window.location.reload()} 
+              variant="outline" 
+              size="sm" 
+              className="mt-2"
+            >
+              Retry
+            </Button>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="w-64 bg-gray-50 border-r border-gray-200 flex flex-col h-full">
+    <div className={sidebarClasses}>
       {/* Header */}
       <div className="p-4 border-b border-gray-200">
+        <div className="flex items-center justify-between mb-3 md:mb-0 md:justify-center">
+          <h2 className="text-lg font-semibold text-gray-900 md:hidden">
+            Conversations
+          </h2>
+          <Button
+            onClick={onToggle}
+            variant="ghost"
+            size="sm"
+            className="md:hidden"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </Button>
+        </div>
         <Button
           onClick={handleNewChat}
-          className="w-full flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white"
+          className="w-full flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white mt-3 md:mt-0"
         >
           <Plus className="w-4 h-4" />
           New Chat

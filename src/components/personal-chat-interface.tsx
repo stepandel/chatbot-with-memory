@@ -5,7 +5,7 @@ import { useSession, signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
-import { Send, LogOut } from "lucide-react";
+import { Send, LogOut, Menu } from "lucide-react";
 import ChatSidebar from "./chat-sidebar";
 import MarkdownMessage from "./markdown-message";
 import { useConversations } from "@/hooks/useConversations";
@@ -32,6 +32,7 @@ export default function PersonalChatInterface() {
     useState<Conversation | null>(null);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -74,6 +75,8 @@ export default function PersonalChatInterface() {
 
   const handleConversationSelect = (conversationId: string) => {
     loadConversation(conversationId);
+    // Close sidebar on mobile after selection
+    setSidebarOpen(false);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -262,33 +265,53 @@ export default function PersonalChatInterface() {
   };
 
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen relative">
+      {/* Mobile Overlay */}
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
       <ChatSidebar
         currentConversationId={currentConversation?.id || null}
         onConversationSelect={handleConversationSelect}
         onNewChat={handleNewChat}
         conversationsHook={conversationsHook}
+        isOpen={sidebarOpen}
+        onToggle={() => setSidebarOpen(!sidebarOpen)}
       />
 
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col w-0">
         {/* Header */}
         <div className="flex justify-between items-center p-4 bg-white border-b border-gray-200">
-          <div>
-            <h1 className="text-xl font-semibold text-gray-900">
-              🔒 Personal AI Chat
-            </h1>
-            <p className="text-sm text-blue-700">
-              {currentConversation
-                ? currentConversation.title
-                : "Start a new conversation"}
-            </p>
-            {session?.user && (
-              <p className="text-xs text-gray-600 mt-1">
-                Signed in as {session.user.name || session.user.email}
+          <div className="flex items-center gap-3">
+            <Button
+              onClick={() => setSidebarOpen(true)}
+              variant="ghost"
+              size="sm"
+              className="md:hidden"
+            >
+              <Menu className="w-5 h-5" />
+            </Button>
+            <div>
+              <h1 className="text-xl font-semibold text-gray-900">
+                🔒 Personal AI Chat
+              </h1>
+              <p className="text-sm text-blue-700">
+                {currentConversation
+                  ? currentConversation.title
+                  : "Start a new conversation"}
               </p>
-            )}
+              {session?.user && (
+                <p className="text-xs text-gray-600 mt-1">
+                  Signed in as {session.user.name || session.user.email}
+                </p>
+              )}
+            </div>
           </div>
           <div className="flex items-center gap-2">
             <Button
