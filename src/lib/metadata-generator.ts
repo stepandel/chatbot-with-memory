@@ -50,6 +50,12 @@ CRITICAL COMPRESSION RULES:
 - If existing metadata already covers the topic, return empty array for that category
 - Prioritize QUALITY over QUANTITY - be extremely selective
 
+CRITICAL FILTERING RULES:
+- IGNORE user requests about accessing previous conversations, chat history, or past interactions
+- IGNORE requests to "remember" or "recall" previous discussions
+- IGNORE requests to search through historical data or conversation logs
+- ONLY extract metadata from NEW information explicitly provided by the user in the current conversation
+- Focus exclusively on fresh content, topics, and context introduced in this specific exchange
 
 CRITICAL: Respond with ONLY valid JSON. Do NOT wrap in markdown code blocks. Do NOT include any text before or after the JSON. Return raw JSON only.
 
