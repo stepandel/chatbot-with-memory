@@ -54,7 +54,7 @@ export async function generateWithSystemPrompt(
     model,
     messages: [
       { role: "system", content: systemPrompt },
-      { role: "user", content: userPrompt }
+      { role: "user", content: userPrompt },
     ],
   });
 }

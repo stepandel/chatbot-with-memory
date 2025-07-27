@@ -10,12 +10,14 @@ interface ChatSidebarProps {
   currentConversationId: string | null;
   onConversationSelect: (conversationId: string) => void;
   onNewChat: () => void;
+  conversationsHook: ReturnType<typeof useConversations>;
 }
 
 export default function ChatSidebar({ 
   currentConversationId, 
   onConversationSelect, 
-  onNewChat 
+  onNewChat,
+  conversationsHook
 }: ChatSidebarProps) {
   const { 
     conversations, 
@@ -24,7 +26,7 @@ export default function ChatSidebar({
     createConversation, 
     deleteConversation, 
     updateConversation 
-  } = useConversations();
+  } = conversationsHook;
   
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState("");

@@ -47,6 +47,7 @@ export function useConversations() {
       }
 
       const newConversation = await response.json();
+      // Optimistically update the list immediately
       setConversations(prev => [newConversation, ...prev]);
       return newConversation;
     } catch (err) {
@@ -88,8 +89,11 @@ export function useConversations() {
       }
 
       const updatedConversation = await response.json();
+      // Update the conversation and re-sort by updatedAt
       setConversations(prev => 
-        prev.map(c => c.id === conversationId ? updatedConversation : c)
+        prev
+          .map(c => c.id === conversationId ? updatedConversation : c)
+          .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
       );
       return true;
     } catch (err) {

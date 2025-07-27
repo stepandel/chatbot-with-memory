@@ -25,7 +25,8 @@ interface Conversation {
 
 export default function PersonalChatInterface() {
   const { data: session } = useSession();
-  const { createConversation, refreshConversations } = useConversations();
+  const conversationsHook = useConversations();
+  const { createConversation, updateConversation } = conversationsHook;
   const [currentConversation, setCurrentConversation] =
     useState<Conversation | null>(null);
   const [input, setInput] = useState("");
@@ -78,6 +79,7 @@ export default function PersonalChatInterface() {
           messages: [],
         });
 
+        // The hook already updates the conversations list automatically
         // Wait a bit for state to update then proceed with message
         setTimeout(() => sendMessage(newConversation.id, input), 100);
         return;
@@ -189,19 +191,21 @@ export default function PersonalChatInterface() {
             const finalAssistantMessage = prev.messages.find(m => m.role === "assistant");
             if (finalAssistantMessage && finalAssistantMessage.content) {
               // Asynchronously update the title with both user message and assistant response
-              ConversationTitleGenerator.updateTitleWithResponse(
-                conversationId,
-                messageContent,
-                finalAssistantMessage.content,
-                (newTitle) => {
-                  // Update the current conversation title in state
+              ConversationTitleGenerator.generateTitle({
+                userMessage: messageContent,
+                assistantResponse: finalAssistantMessage.content
+              }).then(async (newTitle) => {
+                // Update through the hook so sidebar updates automatically
+                const success = await updateConversation(conversationId, newTitle);
+                if (success) {
+                  // Update the current conversation title in local state
                   setCurrentConversation(current => 
                     current ? { ...current, title: newTitle } : null
                   );
-                  // Refresh the conversations list in the sidebar
-                  refreshConversations();
                 }
-              );
+              }).catch(error => {
+                console.error("Error updating conversation title:", error);
+              });
             }
           }
           return prev;
@@ -238,6 +242,7 @@ export default function PersonalChatInterface() {
         currentConversationId={currentConversation?.id || null}
         onConversationSelect={handleConversationSelect}
         onNewChat={handleNewChat}
+        conversationsHook={conversationsHook}
       />
 
       {/* Main Chat Area */}
