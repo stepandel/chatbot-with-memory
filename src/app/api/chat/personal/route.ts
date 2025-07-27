@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
       where: {
         id: conversationId,
         userId: userId,
-      }
+      },
     });
 
     if (!conversation) {
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
       select: {
         role: true,
         content: true,
-      }
+      },
     });
 
     // Step 1, 2, 3: Parallelize metadata loading, embedding creation, and context query
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
     const messages = [
       { role: "system" as const, content: systemPrompt },
       ...contextMessages,
-      ...dbMessages.map(msg => ({
+      ...dbMessages.map((msg) => ({
         role: msg.role as "user" | "assistant",
         content: msg.content,
       })),
@@ -109,30 +109,28 @@ export async function POST(request: NextRequest) {
           // Save to database
           await prisma.$transaction(async (tx) => {
             // Save user message
-            await tx.message.create({
-              data: {
-                id: uuidv4(),
-                conversationId,
-                role: "user",
-                content: message,
-              }
-            });
-
-            // Save assistant response
-            await tx.message.create({
-              data: {
-                id: uuidv4(),
-                conversationId,
-                role: "assistant",
-                content: assistantResponse,
-              }
-            });
-
-            // Update conversation's updatedAt timestamp
-            await tx.conversation.update({
-              where: { id: conversationId },
-              data: { updatedAt: new Date() }
-            });
+            await Promise.all([
+              tx.message.create({
+                data: {
+                  id: uuidv4(),
+                  conversationId,
+                  role: "user",
+                  content: message,
+                },
+              }),
+              tx.message.create({
+                data: {
+                  id: uuidv4(),
+                  conversationId,
+                  role: "assistant",
+                  content: assistantResponse,
+                },
+              }),
+              tx.conversation.update({
+                where: { id: conversationId },
+                data: { updatedAt: new Date() },
+              }),
+            ]);
           });
 
           // Save to Pinecone for vector search
