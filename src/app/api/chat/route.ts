@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { createEmbedding, createChatCompletion } from "@/lib/openai";
 import { queryMessages, upsertMessage, ChatMessage } from "@/lib/pinecone";
 import { MetadataService } from "@/lib/metadata-service";
+import { ContextFormatter } from "@/lib/context-formatter";
 import { v4 as uuidv4 } from "uuid";
 
 export async function POST(request: NextRequest) {
@@ -22,13 +23,15 @@ export async function POST(request: NextRequest) {
 
     const userId = session.user.id; // Use authenticated user ID
 
-    // Step 1: Create embedding for the user message
-    const userEmbedding = await createEmbedding(message);
+    // Step 1, 2, 3: Parallelize metadata loading, embedding creation, and context query
+    const [userMetadata, userEmbedding] = await Promise.all([
+      MetadataService.getUserMetadata(userId),
+      createEmbedding(message),
+    ]);
 
-    // Step 2: Query Pinecone for relevant context
     const relevantMessages = await queryMessages(userEmbedding, userId, 5);
 
-    // Step 3: Build chat history with context
+    // Step 4: Build chat history with context
     const contextMessages = relevantMessages
       .sort((a, b) => a.metadata.timestamp - b.metadata.timestamp)
       .map((match) => ({
@@ -36,13 +39,18 @@ export async function POST(request: NextRequest) {
         content: match.metadata.message,
       }));
 
-    // Add the current user message
+    // Step 5: Create system message with metadata context
+    const systemPrompt =
+      ContextFormatter.createSystemPromptWithContext(userMetadata);
+
+    // Build messages array with system context
     const messages = [
+      { role: "system" as const, content: systemPrompt },
       ...contextMessages,
       { role: "user" as const, content: message },
     ];
 
-    // Step 4: Create chat completion with streaming
+    // Step 6: Create chat completion with streaming
     const completion = await createChatCompletion(messages);
 
     // Create a readable stream to handle the response
@@ -59,7 +67,7 @@ export async function POST(request: NextRequest) {
             }
           }
 
-          // Step 5: Save both messages to Pinecone after completion
+          // Step 7: Save both messages to Pinecone after completion
           const timestamp = Date.now();
 
           // Save user message
@@ -93,7 +101,7 @@ export async function POST(request: NextRequest) {
             userId
           );
 
-          // Step 6: Update contextual metadata asynchronously
+          // Step 8: Update contextual metadata asynchronously
           MetadataService.processMetadataAsync(
             userId,
             message,

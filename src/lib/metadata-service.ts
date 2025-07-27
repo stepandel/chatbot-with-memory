@@ -117,10 +117,7 @@ export class MetadataService {
         keyQuestions: metadata.keyQuestions as string[],
         emergingTrends: metadata.emergingTrends as string[],
         userSentiments: metadata.userSentiments as string[],
-        peopleMentions: metadata.peopleMentions as Array<{
-          name: string;
-          context: string;
-        }>,
+        peopleMentions: metadata.peopleMentions as string[],
         createdAt: metadata.createdAt,
         updatedAt: metadata.updatedAt,
         lastInteractionAt: metadata.lastInteractionAt,
