@@ -13,7 +13,7 @@ declare module "next-auth" {
 }
 
 export const authOptions: NextAuthOptions = {
-  debug: process.env.NODE_ENV === "development",
+  debug: false,
   adapter: PrismaAdapter(prisma),
   providers: [
     GoogleProvider({
