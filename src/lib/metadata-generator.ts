@@ -26,10 +26,7 @@ export interface ExistingMetadata {
   keyQuestions: string[];
   emergingTrends: string[];
   userSentiments: string[];
-  peopleMentions: Array<{
-    name: string;
-    context: string;
-  }>;
+  peopleMentions: string[];
 }
 
 export class MetadataGenerator {
@@ -224,13 +221,14 @@ Based on this new conversation and the existing metadata, what updates should be
     );
 
     // For people mentions, check for duplicate names
-    const existingNames = existing.peopleMentions.map((p) =>
-      p.name.toLowerCase()
-    );
+    const existingNames = existing.peopleMentions.map((p) => p.toLowerCase());
+
     merged.peopleMentions.push(
-      ...newMetadata.peopleMentions.filter(
-        (mention) => !existingNames.includes(mention.name.toLowerCase())
-      )
+      ...newMetadata.peopleMentions
+        .filter(
+          (mention) => !existingNames.includes(mention.name.toLowerCase())
+        )
+        .map((mention) => mention.name)
     );
 
     return merged;

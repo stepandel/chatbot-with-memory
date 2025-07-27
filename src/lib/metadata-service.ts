@@ -1,4 +1,4 @@
-import { prisma } from "./prisma";
+import { prisma } from "@/lib/prisma";
 import {
   MetadataGenerator,
   ConversationContext,
@@ -28,10 +28,7 @@ export class MetadataService {
           keyQuestions: existingRecord.keyQuestions as string[],
           emergingTrends: existingRecord.emergingTrends as string[],
           userSentiments: existingRecord.userSentiments as string[],
-          peopleMentions: existingRecord.peopleMentions as Array<{
-            name: string;
-            context: string;
-          }>,
+          peopleMentions: existingRecord.peopleMentions as string[],
         };
       } else {
         // First interaction for this user
