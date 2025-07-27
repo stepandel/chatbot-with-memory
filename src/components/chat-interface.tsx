@@ -154,20 +154,6 @@ export default function ChatInterface({ mode = "fun" }: ChatInterfaceProps) {
         </div>
         <div className="flex items-center gap-2">
           <Button
-            onClick={() =>
-              (window.location.href = mode === "fun" ? "/app" : "/")
-            }
-            variant="ghost"
-            size="sm"
-            className={`text-xs ${
-              mode === "fun"
-                ? "text-purple-600 hover:text-purple-800"
-                : "text-blue-600 hover:text-blue-800"
-            }`}
-          >
-            Switch to {mode === "fun" ? "Personal" : "Fun"} Mode
-          </Button>
-          <Button
             onClick={() => signOut()}
             variant="outline"
             size="sm"
