@@ -144,12 +144,12 @@ export default function FunModePage() {
               </div>
 
               <Button 
-                onClick={() => window.location.href = "/auth/signin/regular"}
+                onClick={() => signIn("google", { callbackUrl: "/app" })}
                 variant="outline"
                 className="w-full border-blue-300 text-blue-700 hover:bg-blue-50 py-3"
                 size="lg"
               >
-                Choose Personal Mode
+                Sign in with Google
               </Button>
             </div>
           </Card>

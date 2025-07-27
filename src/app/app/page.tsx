@@ -12,7 +12,7 @@ export default function RegularModePage() {
     if (status === "loading") return; // Still loading
 
     if (!session) {
-      redirect("/auth/signin/regular");
+      redirect("/auth/signin");
       return;
     }
 

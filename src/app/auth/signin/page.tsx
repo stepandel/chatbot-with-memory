@@ -1,5 +1,6 @@
 "use client";
 
+import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Link from "next/link";
@@ -75,14 +76,13 @@ export default function SignInModeSelector() {
                 </ul>
               </div>
 
-              <Link href="/auth/signin/regular">
-                <Button
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3"
-                  size="lg"
-                >
-                  Sign in with Google
-                </Button>
-              </Link>
+              <Button
+                onClick={() => signIn("google", { callbackUrl: "/app" })}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3"
+                size="lg"
+              >
+                Sign in with Google
+              </Button>
             </div>
           </Card>
         </div>
