@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Send, LogOut } from "lucide-react";
+import MarkdownMessage from "./markdown-message";
 
 interface Message {
   id: string;
@@ -226,22 +227,13 @@ export default function ChatInterface({ mode = "fun" }: ChatInterfaceProps) {
           </div>
         )}
         {messages.map((message) => (
-          <div
-            key={message.id}
-            className={`flex ${
-              message.role === "user" ? "justify-end" : "justify-start"
-            }`}
-          >
-            <Card
-              className={`max-w-[80%] p-4 ${
-                message.role === "user"
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-100 text-gray-900"
-              }`}
-            >
-              <div className="whitespace-pre-wrap">{message.content}</div>
-            </Card>
-          </div>
+          <MarkdownMessage 
+            key={message.id} 
+            message={{
+              ...message,
+              createdAt: new Date(message.timestamp).toISOString()
+            }} 
+          />
         ))}
         <div ref={messagesEndRef} />
       </div>
