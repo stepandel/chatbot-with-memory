@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Send, LogOut } from "lucide-react";
 import MarkdownMessage from "./markdown-message";
@@ -25,6 +25,7 @@ export default function ChatInterface({ mode = "fun" }: ChatInterfaceProps) {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -33,6 +34,26 @@ export default function ChatInterface({ mode = "fun" }: ChatInterfaceProps) {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  const autoResize = () => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.style.height = 'auto';
+      textarea.style.height = textarea.scrollHeight + 'px';
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInput(e.target.value);
+    autoResize();
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit(e);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,6 +68,10 @@ export default function ChatInterface({ mode = "fun" }: ChatInterfaceProps) {
 
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
+    // Reset textarea height
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+    }
     setIsLoading(true);
 
     try {
@@ -238,13 +263,16 @@ export default function ChatInterface({ mode = "fun" }: ChatInterfaceProps) {
         <div ref={messagesEndRef} />
       </div>
 
-      <form onSubmit={handleSubmit} className="flex gap-2">
-        <Input
+      <form onSubmit={handleSubmit} className="flex gap-2 items-end">
+        <Textarea
+          ref={textareaRef}
           value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Type your message..."
+          onChange={handleInputChange}
+          onKeyDown={handleKeyDown}
+          placeholder="Type your message... (Shift+Enter for new line)"
           disabled={isLoading}
-          className="flex-1"
+          className="flex-1 min-h-[40px] max-h-[200px] resize-none overflow-y-auto"
+          rows={1}
         />
         <Button type="submit" disabled={isLoading || !input.trim()}>
           <Send className="w-4 h-4" />
