@@ -31,10 +31,3 @@ export function getAppMode(pathname: string): AppMode {
 export function getModeHomePath(mode: AppMode): string {
   return mode === "fun" ? "/" : "/app";
 }
-
-/**
- * Gets the appropriate signin path for a mode
- */
-export function getModeSigninPath(_mode: AppMode): string {
-  return "/";
-}
