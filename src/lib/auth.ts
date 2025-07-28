@@ -49,6 +49,35 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
   },
   callbacks: {
+    async signIn({ user, account }) {
+      // For Google sign-ins, ensure the user exists in our database
+      if (account?.provider === "google" && user.email) {
+        try {
+          // Check if user already exists
+          let existingUser = await prisma.user.findUnique({
+            where: { email: user.email }
+          });
+
+          if (!existingUser) {
+            // Create new user record with proper ID
+            existingUser = await prisma.user.create({
+              data: {
+                email: user.email,
+                name: user.name,
+                image: user.image,
+              }
+            });
+          }
+
+          // Update the user object with the database ID
+          user.id = existingUser.id;
+        } catch (error) {
+          console.error("Error creating user:", error);
+          // Continue with sign-in even if user creation fails
+        }
+      }
+      return true;
+    },
     async jwt({ token, user, account }) {
       if (user) {
         if (account?.provider === "fun-mode") {

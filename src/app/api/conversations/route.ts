@@ -16,6 +16,17 @@ export async function GET() {
       return new Response("Not available in fun mode", { status: 400 });
     }
 
+    // First, ensure the user exists in the database
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id }
+    });
+
+    if (!user) {
+      // If user doesn't exist, return empty array instead of error
+      console.log(`User ${session.user.id} not found in database, returning empty conversations`);
+      return Response.json([]);
+    }
+
     const conversations = await prisma.conversation.findMany({
       where: { userId: session.user.id },
       select: {
@@ -54,6 +65,23 @@ export async function POST(request: NextRequest) {
 
     if (!title || typeof title !== "string") {
       return new Response("Title is required", { status: 400 });
+    }
+
+    // Ensure the user exists in the database
+    let user = await prisma.user.findUnique({
+      where: { id: session.user.id }
+    });
+
+    if (!user) {
+      // Create the user if they don't exist
+      user = await prisma.user.create({
+        data: {
+          id: session.user.id,
+          email: session.user.email || "",
+          name: session.user.name || "",
+          image: session.user.image || null,
+        }
+      });
     }
 
     const conversation = await prisma.conversation.create({
