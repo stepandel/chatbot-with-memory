@@ -145,17 +145,17 @@ export default function ChatInterface({ mode = "fun" }: ChatInterfaceProps) {
       <div
         className={`flex justify-between items-center mb-4 p-4 rounded-lg shadow-sm border ${
           mode === "fun"
-            ? "bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200"
+            ? "bg-gradient-to-r from-gray-50 to-gray-100 border-gray-300"
             : "bg-white border-gray-200"
         }`}
       >
         <div>
           {mode === "fun" ? (
             <>
-              <h1 className="text-xl font-semibold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              <h1 className="text-xl font-semibold text-gray-800">
                 🎉 Fun Mode
               </h1>
-              <p className="text-sm text-purple-700 mt-1">
+              <p className="text-sm text-gray-600 mt-1">
                 Collective AI experience • Everyone shares this conversation
                 memory
               </p>
@@ -185,7 +185,7 @@ export default function ChatInterface({ mode = "fun" }: ChatInterfaceProps) {
             size="sm"
             className={`flex items-center gap-2 ${
               mode === "fun"
-                ? "border-purple-300 text-purple-700 hover:bg-purple-50"
+                ? "border-gray-400 text-gray-700 hover:bg-gray-100"
                 : "border-gray-300 text-gray-700 hover:bg-gray-50"
             }`}
           >
@@ -201,17 +201,17 @@ export default function ChatInterface({ mode = "fun" }: ChatInterfaceProps) {
             <Card
               className={`max-w-md p-6 border ${
                 mode === "fun"
-                  ? "bg-gradient-to-br from-blue-50 to-purple-50 border-purple-200"
+                  ? "bg-gradient-to-br from-gray-50 to-gray-100 border-gray-300"
                   : "bg-gradient-to-br from-blue-50 to-gray-50 border-blue-200"
               }`}
             >
               <div className="text-center">
                 {mode === "fun" ? (
                   <>
-                    <h3 className="text-lg font-semibold text-purple-800 mb-3">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-3">
                       Welcome to Fun Mode! 🚀
                     </h3>
-                    <div className="text-sm text-purple-700 space-y-2">
+                    <div className="text-sm text-gray-700 space-y-2">
                       <p>
                         You&apos;re now part of a collective AI experience
                         where:
