@@ -1,24 +1,44 @@
 # AI Chat App
 
-A full-stack chat application with AI responses, vector memory, and user authentication.
+A dual-mode AI chat application with collective and personal experiences, featuring markdown rendering, conversation management, and seamless authentication.
 
-## Features
+## 🎯 Two Distinct Experiences
 
-- 🤖 **AI Chat**: Powered by OpenAI GPT-4o
-- 🧠 **Vector Memory**: Pinecone for conversation context retrieval
-- 🔐 **Authentication**: NextAuth.js with PostgreSQL
-- 💬 **Real-time Streaming**: Streaming AI responses
-- 👤 **Multi-user**: Isolated conversations per user
+### 🎉 Fun Mode
+- **Collective AI Experience**: Everyone shares the same conversation memory
+- **No Sign-in Required**: Instant access for experimentation
+- **Shared Knowledge**: AI learns from all user interactions
+- **Perfect for**: Discovery, learning, and collaborative conversations
 
-## Tech Stack
+### 🔒 Personal Mode  
+- **Private AI Assistant**: Personal conversation history and memory
+- **Google Authentication**: Secure, private access
+- **Chat Management**: Save, organize, and revisit conversations
+- **Perfect for**: Personal projects, private assistance, and individual workflows
 
-- **Frontend**: Next.js 15 (App Router), React, TypeScript, Tailwind CSS, ShadCN UI
-- **Backend**: Next.js API Routes, NextAuth.js
-- **Database**: PostgreSQL (Docker)
-- **Vector DB**: Pinecone
+## ✨ Features
+
+- 🤖 **AI Chat**: Powered by OpenAI GPT-4o with streaming responses
+- 📝 **Markdown Support**: Rich text rendering with syntax highlighting
+- 💬 **Conversation Management**: Save, title, and organize chat history (Personal Mode)
+- 📱 **Mobile-Responsive**: Collapsible sidebar and touch-optimized interface
+- ⌨️ **Enhanced Input**: Auto-expanding textarea with Shift+Enter for new lines
+- 🧠 **Vector Memory**: Pinecone for intelligent context retrieval
+- 🔐 **Dual Authentication**: Fun Mode (instant) + Google OAuth (personal)
+- 🎨 **Clean UI**: Minimalist design with grey color scheme
+
+## 🛠 Tech Stack
+
+- **Frontend**: Next.js 15 (App Router), React 19, TypeScript, Tailwind CSS
+- **UI Components**: Custom components with shadcn/ui patterns
+- **Backend**: Next.js API Routes, NextAuth.js v4
+- **Database**: PostgreSQL with Prisma ORM
+- **Vector DB**: Pinecone for semantic search
 - **AI**: OpenAI GPT-4o + text-embedding-3-small
+- **Markdown**: react-markdown with syntax highlighting
+- **Authentication**: NextAuth.js with Google Provider + Custom Fun Mode
 
-## Quick Start
+## 🚀 Quick Start
 
 ### 1. Clone and Install
 
@@ -28,23 +48,37 @@ cd chat-app
 pnpm install
 ```
 
-### 2. Start Database
+### 2. Environment Setup
+
+Copy `.env.example` to `.env.local` and configure:
 
 ```bash
-# Start PostgreSQL with Docker Compose
-docker-compose up -d postgres
+# Database
+DATABASE_URL="postgresql://chat_user:chat_password@localhost:5432/chat_app_db"
 
-# The database schema will be automatically applied on first run
+# NextAuth
+NEXTAUTH_SECRET="your-secret-here"  # Generate: openssl rand -base64 32
+NEXTAUTH_URL="http://localhost:3000"
+
+# Google OAuth (for Personal Mode)
+GOOGLE_CLIENT_ID="your-google-client-id"
+GOOGLE_CLIENT_SECRET="your-google-client-secret"
+
+# AI Services
+OPENAI_API_KEY="your-openai-api-key"
+PINECONE_API_KEY="your-pinecone-api-key"
+PINECONE_INDEX="your-pinecone-index-name"
 ```
 
-### 3. Environment Setup
+### 3. Start Database
 
-Copy `.env.local` and update the required API keys:
+```bash
+# Start PostgreSQL with Docker
+docker-compose up -d postgres
 
-- `OPENAI_API_KEY` - Your OpenAI API key
-- `PINECONE_API_KEY` - Your Pinecone API key
-- `PINECONE_INDEX` - Your Pinecone index name
-- `NEXTAUTH_SECRET` - Generate with: `openssl rand -base64 32`
+# Run database migrations
+pnpm db:migrate
+```
 
 ### 4. Run Development Server
 
@@ -54,93 +88,141 @@ pnpm dev
 
 Visit [http://localhost:3000](http://localhost:3000)
 
-## Authentication
+## 🏗 Project Structure
 
-### Demo Credentials
+```
+src/
+├── app/                    # Next.js App Router pages
+│   ├── page.tsx           # Home page (Fun Mode + Auth selection)
+│   ├── app/page.tsx       # Personal Mode chat interface
+│   └── api/               # API routes
+├── components/            # React components
+│   ├── chat-interface.tsx         # Fun Mode chat
+│   ├── personal-chat-interface.tsx # Personal Mode chat
+│   ├── chat-sidebar.tsx           # Conversation sidebar
+│   ├── markdown-message.tsx       # Message rendering
+│   └── ui/                        # Base UI components
+├── hooks/                 # Custom React hooks
+│   └── useConversations.ts        # Conversation management
+├── lib/                   # Utilities and configurations
+│   ├── auth.ts            # NextAuth configuration
+│   ├── openai.ts          # OpenAI client
+│   ├── pinecone.ts        # Pinecone client
+│   └── conversation-title-generator.ts # AI title generation
+└── prisma/               # Database schema and migrations
+```
 
-- **Email**: `demo@example.com`
-- **Password**: `demo`
+## 🎮 Usage
 
-### Google OAuth
+### Fun Mode
+1. Visit homepage
+2. Click "Fun Mode" button
+3. Start chatting immediately
+4. Access shared AI memory and conversations
 
-Configure your Google OAuth credentials in `.env.local`
+### Personal Mode
+1. Visit homepage  
+2. Click "Sign in with Google"
+3. Create and manage private conversations
+4. Use sidebar to navigate chat history
+5. Enjoy personalized AI assistance
 
-## Database Management
+### Chat Features
+- **Markdown Rendering**: AI responses support full markdown
+- **Expandable Input**: Textarea grows with content
+- **Keyboard Shortcuts**: Enter to send, Shift+Enter for new line
+- **Mobile Support**: Collapsible sidebar with overlay
+
+## 🗃 Database Management
+
+### Prisma Commands
+
+```bash
+# Generate Prisma client
+pnpm db:generate
+
+# Run migrations
+pnpm db:migrate
+
+# View database in browser
+pnpm db:studio
+
+# Reset database
+pnpm db:reset
+```
 
 ### pgAdmin (Optional)
 
 Access pgAdmin at [http://localhost:8080](http://localhost:8080)
-
 - **Email**: `admin@chatapp.com`
 - **Password**: `admin123`
 
-### Direct PostgreSQL Access
+## 🔧 Development
 
-```bash
-# Connect to database
-docker exec -it chat-app-postgres psql -U chat_user -d chat_app_db
+### Key Features Implementation
 
-# View tables
-\dt
-
-# Stop database
-docker-compose down
-```
-
-## Import ChatGPT Conversations
-
-You can import your existing ChatGPT conversation history:
-
-```bash
-# Export conversations from ChatGPT Settings > Data Controls > Export
-# Place the conversations.json file in the project root
-pnpm exec tsx scripts/import-conversations.ts ./conversations.json
-```
-
-## Development
-
-### Key Files
-
-- `src/app/page.tsx` - Main chat interface
-- `src/app/api/chat/route.ts` - Chat API with AI + vector search
-- `src/lib/auth.ts` - NextAuth configuration
-- `src/lib/openai.ts` - OpenAI client wrapper
-- `src/lib/pinecone.ts` - Pinecone client wrapper
+- **Dual Mode Architecture**: Separate authentication flows and data isolation
+- **AI Title Generation**: Automatic conversation naming based on content
+- **Markdown Rendering**: Syntax highlighting and rich text display
+- **Responsive Design**: Mobile-first with collapsible navigation
+- **Vector Search**: Semantic conversation history retrieval
 
 ### Database Schema
 
-The PostgreSQL schema is automatically applied when you start the database. See `sql/schema.sql` for the complete schema.
+The app uses Prisma with PostgreSQL:
+- **Users**: Authentication and profile data
+- **Conversations**: Chat sessions (Personal Mode only)  
+- **Messages**: Individual chat messages
 
-### Adding New Auth Providers
+### Adding Features
 
-Edit `src/lib/auth.ts` to add additional OAuth providers.
+1. **New UI Components**: Add to `src/components/ui/`
+2. **API Endpoints**: Create in `src/app/api/`
+3. **Database Changes**: Update `prisma/schema.prisma` and migrate
+4. **Authentication**: Modify `src/lib/auth.ts`
 
-## Production Deployment
+## 🚀 Production Deployment
 
-1. **Database**: Use a managed PostgreSQL service
-2. **Environment**: Update all environment variables
-3. **Security**: Generate a secure `NEXTAUTH_SECRET`
-4. **Domain**: Update `NEXTAUTH_URL` to your production domain
+### Environment Checklist
+- [ ] Configure production database URL
+- [ ] Set secure `NEXTAUTH_SECRET`
+- [ ] Update `NEXTAUTH_URL` to production domain
+- [ ] Configure Google OAuth for production domain
+- [ ] Set up Pinecone production index
+- [ ] Verify OpenAI API key limits
 
-## Troubleshooting
+### Recommended Stack
+- **Hosting**: Vercel, Netlify, or similar
+- **Database**: Railway, Supabase, or managed PostgreSQL
+- **Vector DB**: Pinecone (production tier)
 
-### Database Connection Issues
+## 🐛 Troubleshooting
 
+### Common Issues
+
+**Database Connection**
 ```bash
-# Check if PostgreSQL is running
+# Check PostgreSQL status
 docker-compose ps
-
-# View logs
 docker-compose logs postgres
-
-# Restart database
-docker-compose restart postgres
 ```
 
-### Clear Database
-
+**Build Errors**
 ```bash
-# Remove all data and restart fresh
-docker-compose down -v
-docker-compose up -d postgres
+# Clear Next.js cache
+pnpm clean
+pnpm build
 ```
+
+**Authentication Issues**
+- Verify Google OAuth credentials
+- Check `NEXTAUTH_URL` matches your domain
+- Ensure `NEXTAUTH_SECRET` is set
+
+**Vector Search Not Working**
+- Verify Pinecone API key and index name
+- Check Pinecone index dimensions (1536 for text-embedding-3-small)
+
+## 📄 License
+
+MIT License - see LICENSE file for details.
